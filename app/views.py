@@ -112,17 +112,19 @@ def login(request):
 # def signup(request):
 
 
-def signup():
-    email = "seltam@gmail.com"
-    password = "password"
+# def signup():
+#     email = "seltam@gmail.com"
+#     password = "password"
 
-    if Admin.objects(email=email).first():
-        return Response({"message": "Email already exists"}, status=400)
+#     if Admin.objects(email=email).first():
+#         return Response({"message": "Email already exists"}, status=400)
 
-    admin = Admin(email=email, password=password)
-    admin.save()
+#     admin = Admin(email=email, password=password)
+#     admin.save()
 
-    return Response({"message": "Signup success"}, status=201)
+#     return "done"
+
+# print(signup())
 
 
 
