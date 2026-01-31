@@ -946,7 +946,7 @@ def get_keys(request):
     key_expiry_check = Sender_Activation_code.objects.filter(
         expiry_date__lt=today,
         admin_id=token_data["user_id"]
-    ).exists()
+    )
 
     pay_status = True
     if key_expiry_check:
@@ -1013,7 +1013,7 @@ def generate_key(request):
     key_expiry_check = Sender_Activation_code.objects.filter(
         expiry_date__lt=today,
         admin_id=token_data["user_id"]
-    ).exists()
+    )
 
     if key_expiry_check:
         return Response(
