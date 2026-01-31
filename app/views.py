@@ -178,13 +178,18 @@ def activated_key_for_sender(request):
                 "key": key_obj.activation_code,
                 "used_count": key_obj.using_times,
                 "max_usage": key_obj.max_using,
-                "expiry_date": key_obj.expiry_date.strftime("%Y-%m-%d")
+                 "expiry_date": (
+                key_obj.expiry_date.strftime("%Y-%m-%d")
+                if key_obj.expiry_date else None
+            )
             }
         },
         status=status.HTTP_200_OK
     )
     
     
+          
+           
 
 @api_view(["POST"])
 def activated_key_for_receiver(request):
@@ -662,8 +667,6 @@ def add_admin(request):
 #         },
 #     }, status=status.HTTP_201_CREATED)
 
-  
-  
 @api_view(["GET"])
 def super_admin_dashboard_cards(request):
 
@@ -673,13 +676,13 @@ def super_admin_dashboard_cards(request):
     # 1️⃣ Active Admins
     active_admins = Admin.objects.filter(status="Active").count()
 
-    # 2️⃣ Expired Keys (status expired OR expiry_date < today)
-    expired_keys = (
-        Activation_code.objects.filter(status="Expired") |
-        Activation_code.objects.filter(expiry_date__lt=today)
-    ).count()
+    # 2️⃣ Expired Keys
+    expired_by_status = Activation_code.objects.filter(status="Expired").count()
+    expired_by_date = Activation_code.objects.filter(expiry_date__lt=today).count()
 
-    # 3️⃣ Expiring Soon Keys (next 7 days)
+    expired_keys = expired_by_status + expired_by_date
+
+    # 3️⃣ Expiring Soon Keys
     expiring_soon_keys = Activation_code.objects.filter(
         status="Active",
         expiry_date__gte=today,
