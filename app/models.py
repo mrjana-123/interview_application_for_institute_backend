@@ -5,28 +5,11 @@ import uuid
 
 
 
-
-
-
 class SuperAdmin(Document):
     email = fields.StringField(required=True, unique=True)
     password = fields.StringField(required=True)
     is_active = fields.BooleanField(default=True)
 
-    
-    
-
-class ActivationKey(Document):
-    key = fields.StringField(required=True, unique=True, default=lambda: str(uuid.uuid4()))
-    status = fields.StringField(choices=["Active", "Expired", "Revoked"], default="Active")
-    max_usage = fields.IntField(default=1)
-    used_count = fields.IntField(default=0)
-    created_at = fields.DateTimeField(default=datetime.datetime.utcnow)
-    expiry_date = fields.DateTimeField()
-    
-    
-    
-    
     
 
 class Activation_code(Document):
@@ -38,20 +21,20 @@ class Activation_code(Document):
     created_at = fields.DateTimeField(default=timezone.now)
     activation_date = fields.DateTimeField()
     status = fields.StringField(default="Active")  # Active or Expired
+    expiry_date = DateTimeField()
     
- 
-
-
-
-
-class User(Document):
-    name = fields.StringField()
-    email = fields.EmailField()
-    password = fields.StringField()  # (for demo: plain text, but should hash in real apps)
-    otp = fields.StringField() 
-
- 
-
+class Sender_Activation_code(Document):
+    key_created_by = fields.StringField()
+    admin_id = fields.StringField()
+    activation_code = fields.StringField(unique=True)
+    using_times = fields.IntField(default=0)
+    max_using = fields.IntField(default=1)
+    created_at = fields.DateTimeField(default=timezone.now)
+    activation_date = fields.DateTimeField()
+    status = fields.StringField(default="Active")  # Active or Expired
+    expiry_date = DateTimeField()
+    start_date = DateTimeField()
+    
 
 
 class Admin(Document):
@@ -68,6 +51,20 @@ class Admin(Document):
   
 
    
-   
 
+class ActivationKey(Document):
+    key = fields.StringField(required=True, unique=True, default=lambda: str(uuid.uuid4()))
+    status = fields.StringField(choices=["Active", "Expired", "Revoked"], default="Active")
+    max_usage = fields.IntField(default=1)
+    used_count = fields.IntField(default=0)
+    created_at = fields.DateTimeField(default=datetime.datetime.utcnow)
+    expiry_date = fields.DateTimeField()
+    
+
+
+class User(Document):
+    name = fields.StringField()
+    email = fields.EmailField()
+    password = fields.StringField()  # (for demo: plain text, but should hash in real apps)
+    otp = fields.StringField() 
 
