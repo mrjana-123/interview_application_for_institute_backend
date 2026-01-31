@@ -326,7 +326,7 @@ def get_admin_keys(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    keys = Sender_Activation_code.objects(admin_id=admin_id )
+    keys = Sender_Activation_code.objects(admin_id=admin_id ).order_by('-created_at')
 
     data = []
     for k in keys:
@@ -939,6 +939,19 @@ def get_keys(request):
     admin_id = token_data['user_id']
     print(admin_id)
     # admin_id = request.query_params.get('id')  # e.g. /api/admin-details/?id=3
+    
+    today = timezone.now().date()
+
+    # Check if sender activation code is expired
+    key_expiry_check = Sender_Activation_code.objects.filter(
+        expiry_date__lt=today,
+        admin_id=token_data["user_id"]
+    ).exists()
+
+    pay_status = True
+    if key_expiry_check:
+        pay_status = False
+
 
     if not admin_id:
         return Response({"error": "id parameter is required"}, status=400)
@@ -957,6 +970,7 @@ def get_keys(request):
             "status": k.status,
             "maxUsage": k.max_using,
             "usedCount": k.using_times,
+            "key_cheks": pay_status,
         }
 
         if k.status == "Active":
@@ -976,27 +990,47 @@ def generate_unique_code(length=8):
     return ''.join(secrets.choice(alphabet) for _ in range(length)) 
 
 
-@jwt_required  
+from django.utils import timezone
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+@jwt_required
 @api_view(['POST'])
 def generate_key(request):
     token_data = request.decoded_token
     email = token_data["email"]
     data = request.data
+
     created_by = email
     max_usage = int(data.get("maxUsage", 1))
-    
+
     # Generate unique activation code
     activation_code_str = generate_unique_code()
 
+    today = timezone.now().date()
 
-    key = Activation_code(
-        admin_id = token_data["user_id"],
+    # Check if sender activation code is expired
+    key_expiry_check = Sender_Activation_code.objects.filter(
+        expiry_date__lt=today,
+        admin_id=token_data["user_id"]
+    ).exists()
+
+    if key_expiry_check:
+        return Response(
+            {
+                "success": False,
+                "message": "Key expired. Please make payment to generate a new key."
+            },
+            status=403
+        )
+
+    # Create activation key
+    key = Activation_code.objects.create(
+        admin_id=token_data["user_id"],
         key_created_by=created_by,
         activation_code=activation_code_str,
         max_using=max_usage,
     )
-    
-    key.save()
 
     return Response({
         "success": True,
@@ -1009,6 +1043,45 @@ def generate_key(request):
             "usedCount": key.using_times
         }
     }, status=201)
+
+# @jwt_required  
+# @api_view(['POST'])
+# def generate_key(request):
+#     token_data = request.decoded_token
+#     email = token_data["email"]
+#     data = request.data
+#     created_by = email
+#     max_usage = int(data.get("maxUsage", 1))
+    
+#     # Generate unique activation code
+#     activation_code_str = generate_unique_code()
+    
+#     today = 
+#     key_expriy_check = Sender_Activation_code.objects.filter( expiry_date = today)
+    
+#     if not key_expriy_check:
+#         return "key expriyed make payment you can generate" 
+   
+#     key = Activation_code(
+#         admin_id = token_data["user_id"],
+#         key_created_by=created_by,
+#         activation_code=activation_code_str,
+#         max_using=max_usage,
+#     )
+    
+#     key.save()
+
+#     return Response({
+#         "success": True,
+#         "key": {
+#             "id": str(key.id),
+#             "key": key.activation_code,
+#             "createdDate": key.created_at.strftime("%Y-%m-%d"),
+#             "status": key.status,
+#             "maxUsage": key.max_using,
+#             "usedCount": key.using_times
+#         }
+#     }, status=201)
 
  
   
