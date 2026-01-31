@@ -82,10 +82,15 @@ WSGI_APPLICATION = 'application.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# connect(
+#     db="Interview_application_DB",
+#     host='3.110.17.82', username='', password=''
+# )
 connect(
     db="Interview_application_DB",
     host='127.0.0.1', username='', password=''
 )
+
 
 
 

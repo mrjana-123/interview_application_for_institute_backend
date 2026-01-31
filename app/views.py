@@ -426,6 +426,7 @@ def get_admins(request):
 
     for admin in admins:
         keys = Sender_Activation_code.objects.filter(admin_id=str(admin.id))
+        keys_count = Sender_Activation_code.objects.filter(admin_id=str(admin.id) ,  status = "Active" ).count()
         
         recent_activations_qs = Sender_Activation_code.objects.filter(using_times__gt=0 , admin_id = str(admin.id) ).count()
         
@@ -454,9 +455,9 @@ def get_admins(request):
             "email": admin.email,
             "status": admin.status,
             
-            "service": admin.total_keys,
+            "service": keys_count,
             "usedKey": recent_activations_qs,
-            "reminingkey": int(admin.total_keys - recent_activations_qs),
+            "reminingkey": int(keys_count - recent_activations_qs),
 
             # 🔥 Key stats
             "total_keys": total_keys,
@@ -665,8 +666,8 @@ def super_admin_dashboard_cards(request):
     active_admins = Admin.objects.filter(status="Active").count()
 
     # 2️⃣ Expired Keys
-    expired_by_status = Activation_code.objects.filter(status="Expired").count()
-    expired_by_date = Activation_code.objects.filter(expiry_date__lt=today).count()
+    expired_by_status = Sender_Activation_code.objects.filter(status="Expired").count()
+    expired_by_date = Sender_Activation_code.objects.filter(expiry_date__lt=today).count()
 
     expired_keys = expired_by_status + expired_by_date
 
@@ -909,19 +910,19 @@ def super_admin_login(request):
 # def signup(request):
 
 
-# def signup():
-#     email = "seltam@gmail.com"
-#     password = "password"
+def signup():
+    email = "seltam@gmail.com"
+    password = "password"
 
-#     if Admin.objects(email=email).first():
-#         return Response({"message": "Email already exists"}, status=400)
+    if SuperAdmin.objects(email=email).first():
+        return Response({"message": "Email already exists"}, status=400)
 
-#     admin = Admin(email=email, password=password)
-#     admin.save()
+    admin = Admin(email=email, password=password)
+    admin.save()
 
-#     return "done"
+    return "done"
 
-# print(signup())
+print(signup())
 
 
 
