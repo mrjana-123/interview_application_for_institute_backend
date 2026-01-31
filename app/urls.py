@@ -31,8 +31,8 @@ urlpatterns = [
     
     
     
-    path("activated_key_for_sender/", views.activated_key_for_sender),
-    path("activated_key_for_receiver/", views.activated_key_for_receiver),
+    path("activated_key_for_sender", views.activated_key_for_sender),
+    path("activated_key_for_receiver", views.activated_key_for_receiver),
     
     
     path("super-admin/dashboard/cards/", views.super_admin_dashboard_cards),

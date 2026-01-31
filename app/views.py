@@ -664,19 +664,19 @@ def add_admin(request):
 
   
   
-
 @api_view(["GET"])
 def super_admin_dashboard_cards(request):
-    
+
     today = timezone.now().date()
     soon_date = today + timedelta(days=7)
 
     # 1️⃣ Active Admins
     active_admins = Admin.objects.filter(status="Active").count()
 
-    # 2️⃣ Expired Keys
-    expired_keys = Activation_code.objects.filter(
-        Q(status="Expired") | Q(expiry_date__lt=today)
+    # 2️⃣ Expired Keys (status expired OR expiry_date < today)
+    expired_keys = (
+        Activation_code.objects.filter(status="Expired") |
+        Activation_code.objects.filter(expiry_date__lt=today)
     ).count()
 
     # 3️⃣ Expiring Soon Keys (next 7 days)
