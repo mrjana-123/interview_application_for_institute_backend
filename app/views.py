@@ -947,7 +947,7 @@ def get_keys(request):
         expiry_date__lt=today,
         admin_id=token_data["user_id"]
     )
-
+    print(key_expiry_check)
     pay_status = True
     if key_expiry_check:
         pay_status = False
