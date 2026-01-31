@@ -19,9 +19,9 @@ class Activation_code(Document):
     using_times = fields.IntField(default=0)
     max_using = fields.IntField(default=1)
     created_at = fields.DateTimeField(default=timezone.now)
-    activation_date = fields.DateTimeField()
+    activation_date = fields.DateTimeField(default=timezone.now)
     status = fields.StringField(default="Active")  # Active or Expired
-    expiry_date = DateTimeField()
+    expiry_date = DateTimeField(default=timezone.now)
     
 class Sender_Activation_code(Document):
     key_created_by = fields.StringField()
@@ -30,10 +30,10 @@ class Sender_Activation_code(Document):
     using_times = fields.IntField(default=0)
     max_using = fields.IntField(default=1)
     created_at = fields.DateTimeField(default=timezone.now)
-    activation_date = fields.DateTimeField()
+    activation_date = fields.DateTimeField(default=timezone.now)
     status = fields.StringField(default="Active")  # Active or Expired
-    expiry_date = DateTimeField()
-    start_date = DateTimeField()
+    expiry_date = DateTimeField(default=timezone.now)
+    start_date = DateTimeField(default=timezone.now)
     
 
 
@@ -58,7 +58,7 @@ class ActivationKey(Document):
     max_usage = fields.IntField(default=1)
     used_count = fields.IntField(default=0)
     created_at = fields.DateTimeField(default=datetime.datetime.utcnow)
-    expiry_date = fields.DateTimeField()
+    expiry_date = fields.DateTimeField(default=timezone.now)
     
 
 

@@ -136,7 +136,11 @@ def activated_key_for_sender(request):
         return Response(
             {
                 "error": "Key not active yet",
-                "activation_date": key_obj.activation_date.strftime("%Y-%m-%d")
+               
+                "activation_date": (
+                key_obj.activation_date.strftime("%Y-%m-%d")
+                if key_obj.activation_date else None
+            )
             },
             status=status.HTTP_403_FORBIDDEN
         )
