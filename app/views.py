@@ -949,7 +949,7 @@ def get_keys(request):
     )
     print(key_expiry_check)
     pay_status = True
-    if key_expiry_check:
+    if len(key_expiry_check) == 0:
         pay_status = False
 
 
@@ -1015,7 +1015,7 @@ def generate_key(request):
         admin_id=token_data["user_id"]
     )
 
-    if key_expiry_check:
+    if len(key_expiry_check) == 0:
         return Response(
             {
                 "success": False,
