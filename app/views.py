@@ -155,22 +155,15 @@ def activated_key_for_sender(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # ❌ Usage exceeded
-    if key_obj.using_times >= key_obj.max_using:
-        key_obj.status = "Used"
-        key_obj.save(update_fields=["status"])
-
-        return Response(
-            {"error": "Key usage limit exceeded"},
-            status=status.HTTP_403_FORBIDDEN
-        )
+   
+        
 
     # ✅ Activate key
     key_obj.using_times += 1
 
-    # Auto mark as used if limit reached
-    if key_obj.using_times >= key_obj.max_using:
-        key_obj.status = "Used"
+    # # Auto mark as used if limit reached
+    # if key_obj.using_times >= key_obj.max_using:
+    #     key_obj.status = "Used"
 
     key_obj.save()
 
@@ -244,23 +237,12 @@ def activated_key_for_receiver(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # ❌ Usage exceeded
-    if key_obj.using_times >= key_obj.max_using:
-        key_obj.status = "Used"
-        key_obj.save(update_fields=["status"])
-
-        return Response(
-            {"error": "Key usage limit exceeded"},
-            status=status.HTTP_403_FORBIDDEN
-        )
 
     # ✅ Activate key
     key_obj.using_times += 1
 
     # Auto mark as used if limit reached
-    if key_obj.using_times >= key_obj.max_using:
-        key_obj.status = "Used"
-
+ 
     key_obj.save()
 
     return Response(
@@ -271,7 +253,9 @@ def activated_key_for_receiver(request):
                 "key": key_obj.activation_code,
                 "used_count": key_obj.using_times,
                 "max_usage": key_obj.max_using,
-                "expiry_date": key_obj.expiry_date.strftime("%Y-%m-%d")
+                  "expiry_date": (
+                key_obj.expiry_date.strftime("%Y-%m-%d")
+                if key_obj.expiry_date else None)
             }
         },
         status=status.HTTP_200_OK
