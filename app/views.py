@@ -770,6 +770,7 @@ def super_admin_dashboard_cards(request):
     # 2️⃣ Expired Keys
     expired_by_status = Sender_Activation_code.objects.filter(status="Expired").count()
     expired_by_date = Sender_Activation_code.objects.filter(expiry_date__lt=today).count()
+    total_key = Sender_Activation_code.objects.filter(status = "Active").count()
 
     expired_keys = expired_by_status + expired_by_date
 
@@ -784,6 +785,7 @@ def super_admin_dashboard_cards(request):
         "success": True,
         "data": {
             "active_admins": active_admins,
+            "total_key": total_key,
             "expired_keys": expired_keys,
             "expiring_soon_keys": expiring_soon_keys,
         }
