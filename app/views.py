@@ -954,18 +954,21 @@ def get_keys(request):
             expired_key.status="Expired"
             expired_key.save()
             
-            
 
     # 2️⃣ Check if payment / subscription is valid
     valid_key = Sender_Activation_code.objects(
         expiry_date__gte=today,
         admin_id=admin_id,
         status="Active"
-    ).first()
+    )
 
-    pay_status = bool(valid_key)
 
-    print("Payment status:", pay_status)
+    pay_status = True
+    
+    if len(valid_key) == 0:
+        
+        pay_status = False
+        print("Payment status:", pay_status)
 
         
         
@@ -1031,8 +1034,9 @@ def generate_key(request):
     key_expiry_check = Sender_Activation_code.objects.filter(
         expiry_date__gte=today,
         admin_id=token_data["user_id"],
-       
+        status="Active"
     )
+    
 
     if len(key_expiry_check) == 0:
         return Response(
