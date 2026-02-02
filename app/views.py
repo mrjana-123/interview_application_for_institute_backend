@@ -867,7 +867,7 @@ def login(request):
     }
 
     token = jwt_encode(payload)
-    print(token)
+   
     return Response({
         "message": "Login successful",
         "token": token,
@@ -945,7 +945,9 @@ def get_keys(request):
     # Check if sender activation code is expired
     key_expiry_check = Sender_Activation_code.objects.filter(
         expiry_date__lt=today,
-        admin_id=token_data["user_id"]
+        admin_id=token_data["user_id"],
+        status = "Active"
+        
     )
     print(key_expiry_check)
     pay_status = True
@@ -1012,7 +1014,8 @@ def generate_key(request):
     # Check if sender activation code is expired
     key_expiry_check = Sender_Activation_code.objects.filter(
         expiry_date__lt=today,
-        admin_id=token_data["user_id"]
+        admin_id=token_data["user_id"],
+          status = "Active"
     )
 
     if len(key_expiry_check) == 0:
