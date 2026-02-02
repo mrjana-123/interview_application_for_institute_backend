@@ -262,6 +262,7 @@ def activated_key_for_receiver(request):
     )
 
     
+    
 
 @api_view(["POST"])
 def super_admin_generate_key(request):
@@ -272,6 +273,7 @@ def super_admin_generate_key(request):
     max_usage = int(data.get("max_usage", 1))
     start_date = data.get("start_date")
     expiry_date = data.get("expiry_date")
+    renew_from_key_id = data.get("renew_from_key_id")
 
     if not all([admin_id, start_date, expiry_date]):
         return Response(
@@ -279,8 +281,15 @@ def super_admin_generate_key(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    start_date = datetime.strptime(start_date, "%Y-%m-%d")
-    expiry_date = datetime.strptime(expiry_date, "%Y-%m-%d")
+    # Parse dates
+    try:
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        expiry_date = datetime.strptime(expiry_date, "%Y-%m-%d")
+    except ValueError:
+        return Response(
+            {"error": "Invalid date format. Use YYYY-MM-DD"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     if expiry_date <= start_date:
         return Response(
@@ -288,13 +297,47 @@ def super_admin_generate_key(request):
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    # 🔁 RENEW EXISTING KEY (UPDATE SAME RECORD)
+    if renew_from_key_id:
+        try:
+            key = Sender_Activation_code.objects.get(
+                id=renew_from_key_id,
+                admin_id=admin_id
+            )
+        except Sender_Activation_code.DoesNotExist:
+            return Response(
+                {"error": "Key not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Update same key
+        key.start_date = start_date
+        key.expiry_date = expiry_date
+        key.max_using = max_usage
+        key.using_times = 0           # optional reset
+        key.status = "Active"
+
+        key.save()
+
+        return Response({
+            "success": True,
+            "key": {
+                "id": str(key.id),
+                "key": key.activation_code,
+                "startDate": start_date.strftime("%Y-%m-%d"),
+                "expiryDate": expiry_date.strftime("%Y-%m-%d"),
+                "status": key.status
+            }
+        }, status=status.HTTP_200_OK)
+
+    # 🆕 CREATE NEW KEYS (NORMAL FLOW)
     created_keys = []
 
     for _ in range(key_count):
         key = Sender_Activation_code(
             admin_id=admin_id,
             activation_code=uuid.uuid4().hex.upper()[:10],
-            max_using=1,
+            max_using=max_usage,
             using_times=0,
             start_date=start_date,
             expiry_date=expiry_date,
@@ -313,6 +356,65 @@ def super_admin_generate_key(request):
         "success": True,
         "keys": created_keys
     }, status=status.HTTP_201_CREATED)
+    
+    
+
+# @api_view(["POST"])
+# def super_admin_generate_key(request):
+#     data = request.data
+
+#     admin_id = data.get("admin_id")
+#     key_count = int(data.get("key_count", 1))
+#     max_usage = int(data.get("max_usage", 1))
+#     start_date = data.get("start_date")
+#     expiry_date = data.get("expiry_date")
+#     renew_from_key_id = data.get("renew_from_key_id")
+
+#     if not all([admin_id, start_date, expiry_date]):
+#         return Response(
+#             {"error": "admin_id, start_date, expiry_date required"},
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
+
+#     start_date = datetime.strptime(start_date, "%Y-%m-%d")
+#     expiry_date = datetime.strptime(expiry_date, "%Y-%m-%d")
+
+#     if expiry_date <= start_date:
+#         return Response(
+#             {"error": "Expiry date must be after start date"},
+#             status=status.HTTP_400_BAD_REQUEST
+#         )
+
+#     created_keys = []
+    
+#     if renew_from_key_id:
+        
+        
+#     else:
+        
+#         for _ in range(key_count):
+#             key = Sender_Activation_code(
+#                 admin_id=admin_id,
+#                 activation_code=uuid.uuid4().hex.upper()[:10],
+#                 max_using=1,
+#                 using_times=0,
+#                 start_date=start_date,
+#                 expiry_date=expiry_date,
+#                 status="Active"
+#             )
+#             key.save()
+
+#             created_keys.append({
+#                 "id": str(key.id),
+#                 "key": key.activation_code,
+#                 "startDate": start_date.strftime("%Y-%m-%d"),
+#                 "expiryDate": expiry_date.strftime("%Y-%m-%d"),
+#             })
+
+#         return Response({
+#             "success": True,
+#             "keys": created_keys
+#         }, status=status.HTTP_201_CREATED)
     
     
     
