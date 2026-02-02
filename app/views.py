@@ -834,7 +834,7 @@ def revoke_key(request):
     if not key_id:
         return Response({"error": "key_id is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    key = Sender_Activation_code.objects(id=key_id).first()
+    key = Activation_code.objects(id=key_id).first()
     if not key:
         return Response({"error": "Key not found"}, status=status.HTTP_404_NOT_FOUND)
 
