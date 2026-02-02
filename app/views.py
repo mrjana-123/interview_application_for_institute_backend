@@ -822,6 +822,9 @@ def sender_revoke_key(request):
 
     return Response({"success": True, "message": "Key revoked successfully", "key": str(key.id)}, status=status.HTTP_200_OK)
 
+
+
+
 @api_view(["POST"])
 @jwt_required  
 def revoke_key(request):
