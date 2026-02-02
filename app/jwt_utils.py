@@ -6,9 +6,10 @@ from datetime import datetime, timedelta
 
 
 def jwt_encode(data):
-    data["exp"] = datetime.utcnow() + timedelta(
-        minutes=getattr(settings, "JWT_EXP_MINUTES", 60)
-    )
+    # data["exp"] = datetime.utcnow() + timedelta(
+    #     minutes=getattr(settings, "JWT_EXP_MINUTES", 60)
+    # )
+    data["exp"]  = datetime.utcnow() + timedelta(days=90) 
     token = jwt.encode(
         data,
         getattr(settings, "JWT_SECRET_KEY", settings.SECRET_KEY),
