@@ -942,13 +942,15 @@ def get_keys(request):
     
     today = timezone.now().date()
 
+    print(today)
     # Check if sender activation code is expired
     key_expiry_check = Sender_Activation_code.objects.filter(
-        expiry_date__lt=today,
-        admin_id=token_data["user_id"],
-        status = "Active"
-        
+    expiry_date__gte=today,
+    admin_id=token_data["user_id"],
+    
     )
+    
+    
     print(key_expiry_check)
     pay_status = True
     if len(key_expiry_check) == 0:
