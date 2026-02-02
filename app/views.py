@@ -930,32 +930,46 @@ print(signup())
 
 
 # ✅ API 2: Get Keys List
+
+
 @api_view(['GET'])
 @jwt_required 
 def get_keys(request):
    
-    # Fetch all keys ordered by created_at descending
     token_data = request.decoded_token
-    admin_id = token_data['user_id']
-    print(admin_id)
-    # admin_id = request.query_params.get('id')  # e.g. /api/admin-details/?id=3
-    
+    admin_id = token_data["user_id"]
+
     today = timezone.now().date()
+    print("Today:", today)
 
-    print(today)
-    # Check if sender activation code is expired
-    key_expiry_check = Sender_Activation_code.objects.filter(
-    expiry_date__gte=today,
-    admin_id=token_data["user_id"],
-    
-    )
-    
-    
-    print(key_expiry_check)
-    pay_status = True
-    if len(key_expiry_check) == 0:
-        pay_status = False
+    # 1️⃣ Mark expired keys
+    expired_keys = Sender_Activation_code.objects(
+        expiry_date__lt=today,
+        admin_id=admin_id,
+        status="Active"
+    ).all()
 
+    if expired_keys:
+        for expired_key in expired_keys:
+            expired_key.status="Expired"
+            expired_key.save()
+            
+            
+
+    # 2️⃣ Check if payment / subscription is valid
+    valid_key = Sender_Activation_code.objects(
+        expiry_date__gte=today,
+        admin_id=admin_id,
+        status="Active"
+    ).first()
+
+    pay_status = bool(valid_key)
+
+    print("Payment status:", pay_status)
+
+        
+        
+    
 
     if not admin_id:
         return Response({"error": "id parameter is required"}, status=400)
