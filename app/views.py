@@ -960,7 +960,7 @@ def login(request):
     if not all([email, password]):
         return Response({"error": "Email and password required"}, status=status.HTTP_400_BAD_REQUEST)
 
-    user = Admin.objects.filter(email=email, password=password).first()
+    user = Admin.objects.filter(email=email, password=password ,  status = "Active" ).first()
 
     if not user:
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -1048,6 +1048,14 @@ def get_keys(request):
 
     today = timezone.now().date()
     print("Today:", today)
+    
+    Admin_status = Admin.objects.filter( id =admin_id ).first()
+    
+    Admin_status_check = True
+    
+    if Admin_status.status == "Blocked":
+        Admin_status_check=False
+        
 
     # 1️⃣ Mark expired keys
     expired_keys = Sender_Activation_code.objects(
@@ -1071,15 +1079,18 @@ def get_keys(request):
 
 
     pay_status = True
-    
+
+
+
     if len(valid_key) == 0:
-        
         pay_status = False
         print("Payment status:", pay_status)
 
+
+    if Admin_status.status == "Blocked":
+        pay_status=False
         
         
-    
 
     if not admin_id:
         return Response({"error": "id parameter is required"}, status=400)
@@ -1099,6 +1110,8 @@ def get_keys(request):
             "maxUsage": k.max_using,
             "usedCount": k.using_times,
             "key_cheks": pay_status,
+            "user_status" : Admin_status_check,
+            
         }
 
         if k.status == "Active":
@@ -1402,3 +1415,25 @@ def change_admin_status(request):
    
    
    
+   
+   
+
+@api_view(['POST'])
+@jwt_required
+def change_password(request):
+    token_data = request.decoded_token
+    email = token_data['email']
+    user = Admin.objects(email=email).first()
+    if not user:
+        return Response({"success": False, "error": "User not found"}, status=404)
+    
+    current_password = request.data.get("currentPassword")
+    new_password = request.data.get("newPassword")
+    
+    if user.password != current_password:  # For demo; use hashed password in production
+        return Response({"success": False, "error": "Current password is incorrect"}, status=400)
+    
+    user.password = new_password
+    user.save()
+    return Response({"success": True, "message": "Password changed successfully"})
+

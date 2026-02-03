@@ -40,6 +40,8 @@ urlpatterns = [
     
     
     path("super-admin/dashboard/cards/", views.super_admin_dashboard_cards),
+    
+    path("change_password", views.change_password),
 
     
 ]
