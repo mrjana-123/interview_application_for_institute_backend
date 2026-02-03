@@ -1141,6 +1141,7 @@ def generate_key(request):
     token_data = request.decoded_token
     email = token_data["email"]
     data = request.data
+    admin_id = token_data["user_id"]
 
     created_by = email
     max_usage = int(data.get("maxUsage", 1))
@@ -1157,7 +1158,9 @@ def generate_key(request):
         status="Active"
     )
     
-
+     
+    Admin_status = Admin.objects.filter( id =admin_id ).first()
+    
     if len(key_expiry_check) == 0:
         return Response(
             {
@@ -1166,6 +1169,16 @@ def generate_key(request):
             },
             status=403
         )
+        
+    if Admin_status.status == "Blocked":
+        return Response(
+            {
+                "success": False,
+                "message": "Account Blocked. Contact Super Admin."
+            },
+            status=403
+        )
+        
 
     # Create activation key
     key = Activation_code.objects.create(
