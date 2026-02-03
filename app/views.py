@@ -12,6 +12,25 @@ import string
 
 
 
+#    PaperProps={{
+#                 sx: {
+#                   mt: "50px",
+#                   width: 360,
+#                   maxHeight: 420,
+#                   borderRadius: 3,
+#                   overflow: "hidden",
+#                   boxShadow: "0 12px 30px rgba(0,0,0,0.2)",
+#                 },
+#               }}
+
+
+def mask_key(key: str, visible=2):
+    if not key or len(key) <= visible * 2:
+        return "*" * len(key)
+    hidden = "*" * (len(key) - visible * 2)
+    return f"{key[:visible]}{hidden}{key[-visible:]}"
+
+
 
 def create_key_expiry_notifications():
     today = timezone.now().date()
@@ -30,10 +49,12 @@ def create_key_expiry_notifications():
         ).first()
 
         if not exists:
+            masked_key = mask_key(key.activation_code)
+
             Notification(
                 admin_id=key.admin_id,
                 title="Key Expiry Warning",
-                message=f"Your key {key.activation_code} will expire in 3 days.",
+                message=f"Your key {masked_key} will expire in 3 days.",
                 related_key=key.activation_code
             ).save()
             
