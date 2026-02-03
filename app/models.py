@@ -62,6 +62,15 @@ class ActivationKey(Document):
     
 
 
+
+class Notification(Document):
+    admin_id = fields.StringField(required=True)
+    title = fields.StringField()
+    message = fields.StringField()
+    related_key = fields.StringField()  # activation_code
+    is_read = fields.BooleanField(default=False)
+    created_at = fields.DateTimeField(default=timezone.now)
+
 class User(Document):
     name = fields.StringField()
     email = fields.EmailField()

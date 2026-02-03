@@ -42,6 +42,12 @@ urlpatterns = [
     path("super-admin/dashboard/cards/", views.super_admin_dashboard_cards),
     
     path("change_password", views.change_password),
+    
+  
+    path("notifications/", views.get_notifications),
+    path("notifications/read/<str:id>/", views.mark_notification_read),
+    path("notifications/read-all/", views.mark_all_notifications_read),
+
 
     
 ]

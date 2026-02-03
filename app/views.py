@@ -13,6 +13,34 @@ import string
 
 
 
+def create_key_expiry_notifications():
+    today = timezone.now().date()
+    target_date = today + timedelta(days=3)
+
+    expiring_keys = Sender_Activation_code.objects.filter(
+        expiry_date__date=target_date,
+        status="Active"
+    )
+
+    for key in expiring_keys:
+        exists = Notification.objects.filter(
+            admin_id=key.admin_id,
+            related_key=key.activation_code,
+            title="Key Expiry Warning"
+        ).first()
+
+        if not exists:
+            Notification(
+                admin_id=key.admin_id,
+                title="Key Expiry Warning",
+                message=f"Your key {key.activation_code} will expire in 3 days.",
+                related_key=key.activation_code
+            ).save()
+            
+            
+            
+
+
 
 @api_view(["POST"])
 def delete_key(request):
@@ -1042,7 +1070,7 @@ print(signup())
 @api_view(['GET'])
 @jwt_required 
 def get_keys(request):
-   
+    create_key_expiry_notifications()
     token_data = request.decoded_token
     admin_id = token_data["user_id"]
 
@@ -1450,3 +1478,71 @@ def change_password(request):
     user.save()
     return Response({"success": True, "message": "Password changed successfully"})
 
+
+
+
+
+
+
+            
+    
+@jwt_required
+@api_view(["GET"])
+def get_notifications(request):
+    admin_id = request.decoded_token["user_id"]
+
+    notifications = Notification.objects.filter(
+        admin_id=admin_id
+    ).order_by("-created_at")
+
+    unread_count = Notification.objects.filter(
+        admin_id=admin_id,
+        is_read=False
+    ).count()
+
+    data = [
+        {
+            "id": str(n.id),
+            "title": n.title,
+            "message": n.message,
+            "is_read": n.is_read,
+            "created_at": n.created_at,
+        }
+        for n in notifications
+    ]
+
+    return Response({
+        "unread_count": unread_count,
+        "notifications": data
+    })
+
+
+
+
+
+@jwt_required
+@api_view(["POST"])
+def mark_notification_read(request, id):
+    admin_id = request.decoded_token["user_id"]
+
+    Notification.objects(
+        id=id,
+        admin_id=admin_id
+    ).update_one(set__is_read=True)
+
+    return Response({"success": True})
+
+
+
+
+@jwt_required
+@api_view(["POST"])
+def mark_all_notifications_read(request):
+    admin_id = request.decoded_token["user_id"]
+
+    Notification.objects(
+        admin_id=admin_id,
+        is_read=False
+    ).update(set__is_read=True)
+
+    return Response({"success": True})
