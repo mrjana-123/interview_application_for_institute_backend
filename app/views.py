@@ -1540,22 +1540,6 @@ def get_notifications(request):
 
 
 
-
-@jwt_required
-@api_view(["POST"])
-def mark_notification_read(request, id):
-    admin_id = request.decoded_token["user_id"]
-
-    Notification.objects(
-        id=id,
-        admin_id=admin_id
-    ).update_one(set__is_read=True)
-
-    return Response({"success": True})
-
-
-
-
 @jwt_required
 @api_view(["POST"])
 def mark_all_notifications_read(request):
@@ -1564,6 +1548,28 @@ def mark_all_notifications_read(request):
     Notification.objects(
         admin_id=admin_id,
         is_read=False
-    ).update(set__is_read=True)
+    ).update(is_read=True)
 
     return Response({"success": True})
+
+
+
+
+# @jwt_required
+@api_view(["POST"])
+def mark_notification_read(request, notification_id):
+    admin_id = request.decoded_token["user_id"]
+
+    notif = Notification.objects(
+        id=notification_id,
+        admin_id=admin_id
+    ).first()
+
+    if not notif:
+        return Response({"error": "Notification not found"}, status=404)
+
+    notif.update(is_read=True)
+
+    return Response({"success": True})
+
+

@@ -45,8 +45,9 @@ urlpatterns = [
     
   
     path("notifications/", views.get_notifications),
-    path("notifications/read/<str:id>/", views.mark_notification_read),
-    path("notifications/read-all/", views.mark_all_notifications_read),
+
+    path("api/notifications/read/<str:notification_id>/", views.mark_notification_read),
+    path("api/notifications/read-all/", views.mark_all_notifications_read),
 
 
     
