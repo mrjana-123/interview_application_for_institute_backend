@@ -1508,9 +1508,9 @@ def change_password(request):
 
 
             
-    
-@jwt_required
+
 @api_view(["GET"])
+@jwt_required
 def get_notifications(request):
     admin_id = request.decoded_token["user_id"]
 
@@ -1542,10 +1542,11 @@ def get_notifications(request):
 
 
 
-@jwt_required
 @api_view(["POST"])
+@jwt_required
 def mark_all_notifications_read(request):
-    admin_id = request.decoded_token["user_id"]
+    token_data = request.decoded_token
+    admin_id = token_data["user_id"]
 
     Notification.objects(
         admin_id=admin_id,
@@ -1559,8 +1560,10 @@ def mark_all_notifications_read(request):
 
 # @jwt_required
 @api_view(["POST"])
+@jwt_required
 def mark_notification_read(request, notification_id):
-    admin_id = request.decoded_token["user_id"]
+    token_data = request.decoded_token
+    admin_id = token_data["user_id"]
 
     notif = Notification.objects(
         id=notification_id,
