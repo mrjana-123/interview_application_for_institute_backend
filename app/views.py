@@ -1515,7 +1515,8 @@ def get_notifications(request):
     admin_id = request.decoded_token["user_id"]
 
     notifications = Notification.objects.filter(
-        admin_id=admin_id
+        admin_id=admin_id,
+        is_read=False
     ).order_by("-created_at")
 
     unread_count = Notification.objects.filter(
