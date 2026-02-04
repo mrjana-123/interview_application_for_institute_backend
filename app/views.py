@@ -37,7 +37,9 @@ def create_key_expiry_notifications():
     target_date = today + timedelta(days=3)
 
     expiring_keys = Sender_Activation_code.objects.filter(
+        expiry_date__lte=target_date,
         expiry_date__gte=today,
+         
         status="Active"
     )
 
