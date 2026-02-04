@@ -253,7 +253,7 @@ def activated_key_for_receiver(request):
         key_obj = Activation_code.objects.get(
             activation_code=activation_code
         )
-    except Sender_Activation_code.DoesNotExist:
+    except Activation_code.DoesNotExist:
         return Response(
             {"error": "Invalid activation key"},
             status=status.HTTP_404_NOT_FOUND
@@ -279,14 +279,7 @@ def activated_key_for_receiver(request):
         
 
     # ❌ Expired
-    if today > key_obj.expiry_date:
-        key_obj.status = "Expired"
-        key_obj.save(update_fields=["status"])
-
-        return Response(
-            {"error": "Key expired"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    
 
 
     # ✅ Activate key
@@ -304,7 +297,7 @@ def activated_key_for_receiver(request):
                 "key": key_obj.activation_code,
                 "used_count": key_obj.using_times,
                 "max_usage": key_obj.max_using,
-                  "expiry_date": (
+                "expiry_date": (
                 key_obj.expiry_date.strftime("%Y-%m-%d")
                 if key_obj.expiry_date else None)
             }
