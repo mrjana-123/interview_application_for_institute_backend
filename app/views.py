@@ -1098,6 +1098,16 @@ def get_keys(request):
         status="Active"
     ).order_by("-expiry_date").first()
     
+    pay_status = True
+    expiry_date = None
+
+    if not latest_key:
+        pass
+    
+    else:
+        expiry_date = latest_key.expiry_date
+       
+    
     Admin_status = Admin.objects.filter( id =admin_id ).first()
     
     Admin_status_check = True
@@ -1171,7 +1181,7 @@ def get_keys(request):
     # Merge lists: active first
     sorted_keys = active_keys + other_keys
 
-    return Response({"success": True, "keys": sorted_keys , "exp" : latest_key.expiry_date} , status=200)
+    return Response({"success": True, "keys": sorted_keys , "exp" : expiry_date} , status=200)
 
     
    
