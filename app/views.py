@@ -1095,11 +1095,18 @@ def get_keys(request):
     
     latest_key = Sender_Activation_code.objects(
         admin_id=admin_id,
-        status="Active"
+        status="Active",
+        expiry_date__gte=today
     ).order_by("-expiry_date").first()
     
-    pay_status = True
     expiry_date = None
+    
+    if latest_key:
+        expiry_date = latest_key.expiry_date if latest_key else None
+
+   
+    
+    
 
     if not latest_key:
         pass
