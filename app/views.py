@@ -1145,7 +1145,7 @@ def get_keys(request):
 
 
     pay_status = True
-
+    account_blocked = True
 
 
     if len(valid_key) == 0:
@@ -1154,7 +1154,7 @@ def get_keys(request):
 
 
     if Admin_status.status == "Blocked":
-        pay_status=False
+        account_blocked = False
         
         
 
@@ -1177,6 +1177,7 @@ def get_keys(request):
             "usedCount": k.using_times,
             "key_cheks": pay_status,
             "user_status" : Admin_status_check,
+            "check" : account_blocked,
             
         }
 
