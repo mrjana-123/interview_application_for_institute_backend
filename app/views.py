@@ -1073,7 +1073,6 @@ def signup():
 
     return "done"
 
-print(signup())
 
 
 
@@ -1092,6 +1091,12 @@ def get_keys(request):
 
     today = timezone.now().date()
     print("Today:", today)
+    
+    
+    latest_key = Sender_Activation_code.objects(
+        admin_id=admin_id,
+        status="Active"
+    ).order_by("-expiry_date").first()
     
     Admin_status = Admin.objects.filter( id =admin_id ).first()
     
@@ -1113,7 +1118,7 @@ def get_keys(request):
             expired_key.status="Expired"
             expired_key.save()
             
-
+  
     # 2️⃣ Check if payment / subscription is valid
     valid_key = Sender_Activation_code.objects(
         expiry_date__gte=today,
@@ -1166,7 +1171,7 @@ def get_keys(request):
     # Merge lists: active first
     sorted_keys = active_keys + other_keys
 
-    return Response({"success": True, "keys": sorted_keys}, status=200)
+    return Response({"success": True, "keys": sorted_keys , "exp" : latest_key.expiry_date} , status=200)
 
     
    
