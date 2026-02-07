@@ -1093,9 +1093,16 @@ def get_keys(request):
     print("Today:", today)
     
     
+    # latest_key = Sender_Activation_code.objects(
+    #     admin_id=admin_id,
+    #     status="Active",
+    #     expiry_date__gte=today
+    # ).order_by("-expiry_date").first()
+    
     latest_key = Sender_Activation_code.objects(
         admin_id=admin_id,
         status="Active",
+        start_date__lte=today,
         expiry_date__gte=today
     ).order_by("-expiry_date").first()
     
@@ -1108,11 +1115,6 @@ def get_keys(request):
     
     
 
-    if not latest_key:
-        pass
-    
-    else:
-        expiry_date = latest_key.expiry_date
        
     
     Admin_status = Admin.objects.filter( id =admin_id ).first()
