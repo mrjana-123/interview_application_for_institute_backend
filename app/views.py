@@ -1095,7 +1095,7 @@ def get_keys(request):
     
     latest_key = Sender_Activation_code.objects(
         admin_id=admin_id,
-        # status="Active",
+        status="Active",
         expiry_date__gte=today
     ).order_by("-expiry_date").first()
     
