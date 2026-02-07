@@ -1099,17 +1099,19 @@ def get_keys(request):
     #     expiry_date__gte=today
     # ).order_by("-expiry_date").first()
     
-    latest_key = Sender_Activation_code.objects(
+    keys = Sender_Activation_code.objects(
         admin_id=admin_id,
-        status="Active",
-        start_date__lte=today,
         expiry_date__gte=today
-    ).order_by("-expiry_date").first()
-    
-    
-    
-   
-    expiry_date = latest_key.expiry_date if latest_key else None
+    ).order_by("-expiry_date")  # DESC → latest first
+
+    valid_key = None
+
+    for key in keys:
+        if key.status == "Active":
+            valid_key = key
+            break
+
+    expiry_date = valid_key.expiry_date if valid_key else None
 
    
     
