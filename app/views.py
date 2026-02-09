@@ -1126,12 +1126,14 @@ def get_keys(request):
         
 
     # 1️⃣ Mark expired keys
+    
     expired_keys = Sender_Activation_code.objects(
         expiry_date__lt=today,
         admin_id=admin_id,
         status="Active"
     ).all()
 
+    print( today ,"today ")
     if expired_keys:
         for expired_key in expired_keys:
             expired_key.status="Expired"
