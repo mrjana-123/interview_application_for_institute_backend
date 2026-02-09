@@ -1089,7 +1089,7 @@ def get_keys(request):
     token_data = request.decoded_token
     admin_id = token_data["user_id"]
 
-    today = timezone.now().date()
+    today = timezone.localtime().date()
     print("Today:", today)
     
     
