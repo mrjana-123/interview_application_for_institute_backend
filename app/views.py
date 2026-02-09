@@ -1111,13 +1111,11 @@ def get_keys(request):
             valid_key = key
             break
 
-    expiry_date = valid_key.expiry_date if valid_key else None
+    expiry_date = valid_key.expiry_date if valid_key else 0
 
    
     
-    
 
-       
     
     Admin_status = Admin.objects.filter( id =admin_id ).first()
     
@@ -1151,7 +1149,9 @@ def get_keys(request):
     pay_status = True
     account_blocked = True
 
-
+    print( valid_key )
+    for j in valid_key:
+        print(j.status , "status")
     if len(valid_key) == 0:
         pay_status = False
         print("Payment status:", pay_status)
