@@ -48,6 +48,8 @@ class Admin(Document):
     status = StringField()  # "Active" or "Inactive"
     otp = StringField()
     created_at = DateTimeField(default=datetime.datetime.utcnow)
+    expiry_date = DateTimeField(default=timezone.now)
+    start_date = DateTimeField(default=timezone.now)
   
 
    

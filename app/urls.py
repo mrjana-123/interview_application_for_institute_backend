@@ -28,6 +28,7 @@ urlpatterns = [
     path("delete_key/", views.delete_key),
     path("sender_revoke_key", views.sender_revoke_key),
     path("super_admin_generate_key/", views.super_admin_generate_key),
+    path("super_admin_generate_keys/", views.super_admin_generate_keys),
     
     path("get_admin_details/", views.get_admin_details),
     
