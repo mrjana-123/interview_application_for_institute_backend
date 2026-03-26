@@ -407,6 +407,7 @@ def super_admin_generate_key_new(request):
     keys = Sender_Activation_code.objects.filter(admin_id=admin_id).all()
 
     for key in keys:
+        print("test2")
         # Update same key
         key.start_date = start_date
         key.expiry_date = expiry_date
@@ -419,8 +420,9 @@ def super_admin_generate_key_new(request):
 
     # 🆕 CREATE NEW KEYS (NORMAL FLOW)
     created_keys = []
-
+    print(key_count , " key_count ")
     for _ in range(key_count):
+        print("test")
         new_key = Sender_Activation_code(
             admin_id=admin_id,
             activation_code=uuid.uuid4().hex.upper()[:10],
