@@ -350,39 +350,78 @@ def super_admin_generate_keys(request):
     admin_data.start_date = start_date
     admin_data.expiry_date = expiry_date
     admin_data.save()
+    
+    
+    keys = Sender_Activation_code.objects.filter(admin_id=admin_id).all()
 
-    # 🔁 RENEW EXISTING KEY (UPDATE SAME RECORD)
-    if renew_from_key_id:
-        try:
-            key = Sender_Activation_code.objects.get(
-                id=renew_from_key_id,
-                admin_id=admin_id
-            )
-        except Sender_Activation_code.DoesNotExist:
-            return Response(
-                {"error": "Key not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+    for key in keys:
         # Update same key
         key.start_date = start_date
         key.expiry_date = expiry_date
         key.max_using = max_usage
         key.using_times = 0           # optional reset
         key.status = "Active"
-
         key.save()
 
-        return Response({
-            "success": True,
-            "key": {
-                "id": str(key.id),
-                "key": key.activation_code,
-                "startDate": start_date.strftime("%Y-%m-%d"),
-                "expiryDate": expiry_date.strftime("%Y-%m-%d"),
-                "status": key.status
-            }
-        }, status=status.HTTP_200_OK)
+        
+
+    # 🆕 CREATE NEW KEYS (NORMAL FLOW)
+    created_keys = []
+
+    for _ in range(key_count):
+        key = Sender_Activation_code(
+            admin_id=admin_id,
+            activation_code=uuid.uuid4().hex.upper()[:10],
+            max_using=max_usage,
+            using_times=0,
+            start_date=start_date,
+            expiry_date=expiry_date,
+            status="Active"
+        )
+        key.save()
+
+        created_keys.append({
+            "id": str(key.id),
+            "key": key.activation_code,
+            "startDate": start_date.strftime("%Y-%m-%d"),
+            "expiryDate": expiry_date.strftime("%Y-%m-%d"),
+        })
+
+    return Response({
+        "success": True,
+        "keys": created_keys
+    }, status=status.HTTP_201_CREATED)
+    
+@api_view(["POST"])
+def super_admin_generate_key2(request):
+    data = request.data
+
+    admin_id = data.get("admin_id")
+    key_count = int(data.get("key_count", 1))
+    max_usage = int(data.get("max_usage", 1))
+  
+    
+    
+        
+    
+    admin_data = Admin.objects.filter( id = admin_id   ).first()
+    start_date = admin_data.start_date
+    expiry_date = admin_data.expiry_date
+   
+    
+    
+    keys = Sender_Activation_code.objects.filter(admin_id=admin_id).all()
+
+    for key in keys:
+        # Update same key
+        key.start_date = start_date
+        key.expiry_date = expiry_date
+        key.max_using = max_usage
+        key.using_times = 0           # optional reset
+        key.status = "Active"
+        key.save()
+
+        
 
     # 🆕 CREATE NEW KEYS (NORMAL FLOW)
     created_keys = []
@@ -682,7 +721,7 @@ def get_admins(request):
     admin_list = []
 
     for admin in admins:
-        keys = Sender_Activation_code.objects.filter(admin_id=str(admin.id))
+        keys = Sender_Activation_code.objects.filter(admin_id=str(admin.id) , )
         keys_count = Sender_Activation_code.objects.filter(admin_id=str(admin.id) ,  status = "Active" ).count()
         
         recent_activations_qs = Sender_Activation_code.objects.filter(using_times__gt=0 , admin_id = str(admin.id) ).count()
@@ -713,6 +752,7 @@ def get_admins(request):
             "status": admin.status,
             "expiry_date": admin.expiry_date,
             "start_date": admin.start_date,
+            
             
             "service": keys_count,
             "usedKey": recent_activations_qs,
