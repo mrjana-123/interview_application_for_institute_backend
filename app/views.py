@@ -393,23 +393,17 @@ def super_admin_generate_keys(request):
     }, status=status.HTTP_201_CREATED)
     
 @api_view(["POST"])
-def super_admin_generate_key2(request):
+def super_admin_generate_key_new(request):
     data = request.data
 
     admin_id = data.get("admin_id")
     key_count = int(data.get("key_count", 1))
     max_usage = int(data.get("max_usage", 1))
   
-    
-    
-        
-    
     admin_data = Admin.objects.filter( id = admin_id   ).first()
     start_date = admin_data.start_date
     expiry_date = admin_data.expiry_date
-   
-    
-    
+  
     keys = Sender_Activation_code.objects.filter(admin_id=admin_id).all()
 
     for key in keys:
@@ -427,7 +421,7 @@ def super_admin_generate_key2(request):
     created_keys = []
 
     for _ in range(key_count):
-        key = Sender_Activation_code(
+        new_key = Sender_Activation_code(
             admin_id=admin_id,
             activation_code=uuid.uuid4().hex.upper()[:10],
             max_using=max_usage,
@@ -436,11 +430,11 @@ def super_admin_generate_key2(request):
             expiry_date=expiry_date,
             status="Active"
         )
-        key.save()
+        new_key.save()
 
         created_keys.append({
-            "id": str(key.id),
-            "key": key.activation_code,
+            "id": str(new_key.id),
+            "key": new_key.activation_code,
             "startDate": start_date.strftime("%Y-%m-%d"),
             "expiryDate": expiry_date.strftime("%Y-%m-%d"),
         })
