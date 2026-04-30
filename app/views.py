@@ -375,25 +375,33 @@ def super_admin_generate_keys(request):
 
     # 🆕 CREATE NEW KEYS (NORMAL FLOW)
     created_keys = []
+    
+    keys_check = Sender_Activation_code.objects.filter(admin_id=admin_id)
+    
+    
+    if keys_check:
+        pass 
+    
 
-    for _ in range(key_count):
-        key = Sender_Activation_code(
-            admin_id=admin_id,
-            activation_code=uuid.uuid4().hex.upper()[:10],
-            max_using=max_usage,
-            using_times=0,
-            start_date=start_date,
-            expiry_date=expiry_date,
-            status="Active"
-        )
-        key.save()
+    else:
+        for _ in range(1):
+            key = Sender_Activation_code(
+                admin_id=admin_id,
+                activation_code=uuid.uuid4().hex.upper()[:10],
+                max_using=max_usage,
+                using_times=0,
+                start_date=start_date,
+                expiry_date=expiry_date,
+                status="Active"
+            )
+            key.save()
 
-        created_keys.append({
-            "id": str(key.id),
-            "key": key.activation_code,
-            "startDate": start_date.strftime("%Y-%m-%d"),
-            "expiryDate": expiry_date.strftime("%Y-%m-%d"),
-        })
+            created_keys.append({
+                "id": str(key.id),
+                "key": key.activation_code,
+                "startDate": start_date.strftime("%Y-%m-%d"),
+                "expiryDate": expiry_date.strftime("%Y-%m-%d"),
+            })
 
     return Response({
         "success": True,
