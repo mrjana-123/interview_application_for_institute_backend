@@ -359,10 +359,13 @@ def super_admin_generate_keys(request):
 
     for key in keys:
         # Update same key
+        if key.status == "InActive":
+            continue
         key.start_date = start_date
         key.expiry_date = expiry_date
         key.max_using = max_usage
-        key.using_times = 0           # optional reset
+        key.status="Active"
+        # key.using_times = 0           # optional reset
         
         key.save()
 
@@ -614,6 +617,22 @@ def super_admin_generate_key(request):
 @api_view(["GET"])
 def get_admin_keys(request):
     admin_id = request.GET.get("admin_id")
+    
+    
+    today = timezone.localtime().date()
+    
+    expired_keys = Sender_Activation_code.objects(
+        expiry_date__lt=today,
+        admin_id=admin_id,
+        status="Active"
+    ).all()
+
+    
+    if expired_keys:
+        for expired_key in expired_keys:
+            expired_key.status="Expired"
+            expired_key.save()
+            
 
     if not admin_id:
         return Response(
