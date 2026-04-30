@@ -380,10 +380,15 @@ def super_admin_generate_keys(request):
     
     
     if keys_check:
-        pass 
+        pass
+        # keys_check_2 = Sender_Activation_code.objects.filter(admin_id=admin_id , status = "Active")
+        # if keys_check_2:
+        # else:
+             
     
 
     else:
+        keys_check = Sender_Activation_code.objects.filter(admin_id=admin_id , status = "InActive")
         for _ in range(1):
             key = Sender_Activation_code(
                 admin_id=admin_id,
