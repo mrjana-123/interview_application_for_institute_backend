@@ -196,7 +196,9 @@ def activated_key_for_sender(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
+
     # ❌ Expired
+    print(today)
     if today > key_obj.expiry_date:
         key_obj.status = "Expired"
         key_obj.save(update_fields=["status"])
