@@ -418,7 +418,7 @@ def super_admin_generate_key_new(request):
         key.start_date = start_date
         key.expiry_date = expiry_date
         key.max_using = max_usage
-        key.using_times = 0           # optional reset
+        # key.using_times = 0           # optional reset
         # key.status = "Active"
         key.save()
 
