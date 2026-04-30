@@ -175,7 +175,7 @@ def activated_key_for_sender(request):
 
     today = datetime.now()
     print(today)
-
+    print(key_obj.expiry_date)
     # ❌ Key revoked
     if key_obj.status != "Active":
         return Response(
