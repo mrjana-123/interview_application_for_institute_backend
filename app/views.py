@@ -361,6 +361,8 @@ def super_admin_generate_keys(request):
         # Update same key
         if key.status == "InActive":
             continue
+        if key.status == "Revoked":
+            continue
         key.start_date = start_date
         key.expiry_date = expiry_date
         key.max_using = max_usage
